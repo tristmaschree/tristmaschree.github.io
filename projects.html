@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Projects · Josh Yu</title>
+  <meta name="description" content="Research and projects by Josh Yu.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="assets/icon-512.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <script src="js/theme.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="site-header">
+    <a class="site-title" href="index.html">Josh Yu</a>
+    <div class="header-right">
+      <nav class="site-nav" aria-label="Main">
+        <a href="index.html">Home</a>
+        <a href="projects.html" class="here" aria-current="page">Projects</a>
+        <a href="resume.html">Resume</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <div class="theme-toggle" role="group" aria-label="Colour theme">
+        <button type="button" data-theme-set="system" aria-pressed="true">System</button>
+        <button type="button" data-theme-set="light" aria-pressed="false">Light</button>
+        <button type="button" data-theme-set="dark" aria-pressed="false">Dark</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <h1>Projects</h1>
+    <p class="muted">Research and things I've built.</p>
+
+    <!-- Copy one whole "row" block per project. -->
+    <div class="panel">
+
+      <div class="row">
+        <div class="row-head">
+          <h3>Deepfake Audio Detection</h3>
+          <span class="when">Summer 2026</span>
+        </div>
+        <p>
+          Refined a deepfake audio detection model at StepFun, pruning and
+          retraining it to run inside the production data pipeline. Leaned on
+          interpretability methods like
+          whitening the representations, early-exit tests to find the depth at
+          which the model had already decided, and AUC probing layer by layer.
+        </p>
+        <ul class="tags">
+          <li>Audio ML</li>
+          <li>Interpretability</li>
+          <li>Model pruning</li>
+        </ul>
+      </div>
+
+      <div class="row">
+        <div class="row-head">
+          <h3>Self-View Convergence in Human&#8211;AI Interaction</h3>
+          <span class="when">2025&#8211;2026</span>
+        </div>
+        <p>
+          Studied how AI agents influence human self-perception by building a
+          multi-agent simulation in which LLM agents and human participants
+          engaged in self-revelatory dialogue. Found measurable self-view
+          convergence in social contexts, but not in perceptual ones.
+          Project lead.
+        </p>
+        <ul class="tags">
+          <li>LLM agents</li>
+          <li>Human subjects</li>
+          <li>Python</li>
+        </ul>
+      </div>
+
+      <div class="row">
+        <div class="row-head">
+          <h3>Predictive Analytics in Social Networks</h3>
+          <span class="when">2025&#8211;2026</span>
+        </div>
+        <p>
+          Applied Louvain community detection and k-means clustering to model
+          how social organizations evolve, focusing on predictive analytics in
+          social science contexts. Completed through the Pioneer Research
+          Program.
+        </p>
+        <ul class="tags">
+          <li>Network analysis</li>
+          <li>Clustering</li>
+          <li>Python</li>
+        </ul>
+      </div>
+
+      <div class="row">
+        <div class="row-head">
+          <h3>Medication Management Mini Program</h3>
+          <span class="when">2023&#8211;2026</span>
+        </div>
+        <p>
+          Led a team designing and evaluating a mobile mini program for
+          medication management in chronic kidney disease patients. The paper
+          was accepted into the CTB database, and the project advanced to the
+          global finals and took third place.
+        </p>
+        <ul class="tags">
+          <li>Mobile</li>
+          <li>Health</li>
+          <li>Team lead</li>
+        </ul>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2026 Josh Yu · <a href="https://github.com/tristmaschree/tristmaschree.github.io">Source</a></p>
+  </footer>
+
+</div>
+</body>
+</html>

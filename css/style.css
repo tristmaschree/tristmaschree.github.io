@@ -1,0 +1,228 @@
+/* ===========================================================
+   style.css — every page on the site shares this one file.
+   Change something here and it changes everywhere.
+   =========================================================== */
+
+/* --- Design tokens -----------------------------------------
+   Apple's system palette. Edit these values to restyle the
+   whole site; everything below refers to them as var(--name). */
+:root {
+  --bg:        #ffffff;
+  --bg-alt:    #f5f5f7;   /* Apple's off-white, used for hover */
+  --fg:        #1d1d1f;   /* Apple's near-black text */
+  --muted:     #6e6e73;   /* Apple's secondary label grey */
+  --accent:    #0066cc;   /* Apple's link blue */
+  --rule:      #d2d2d7;   /* Apple's separator grey */
+
+  --measure:   72ch;      /* max line length for comfortable reading */
+  --gutter:    1.25rem;   /* space at the screen edges */
+  --pad:       1rem;      /* side padding inside a panel row */
+
+  /* San Francisco on Apple devices, sensible fallbacks elsewhere. */
+  --font:      -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+/* Dark mode: same tokens, Apple's dark values.
+   Two ways in, and the order matters:
+   1. the visitor's OS is set to dark AND they haven't forced light here;
+   2. they picked Dark from the toggle, which sets data-theme on <html>. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+  --bg:     #000000;
+  --bg-alt: #1d1d1f;
+  --fg:     #f5f5f7;
+  --muted:  #86868b;
+  --accent: #2997ff;
+  --rule:   #333336;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:     #000000;
+  --bg-alt: #1d1d1f;
+  --fg:     #f5f5f7;
+  --muted:  #86868b;
+  --accent: #2997ff;
+  --rule:   #333336;
+}
+
+/* Let form controls and scrollbars follow the chosen theme too. */
+:root { color-scheme: light; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { color-scheme: dark; } }
+:root[data-theme="dark"] { color-scheme: dark; }
+
+/* --- Base --------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0 var(--gutter) 5rem;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  letter-spacing: -.01em;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Everything sits inside this centred column. */
+.wrap { max-width: var(--measure); margin: 0 auto; }
+
+h1, h2, h3 { line-height: 1.2; text-wrap: balance; }
+h1 { font-size: 2.25rem; margin: 0 0 .35rem; letter-spacing: -.025em; font-weight: 600; }
+h2 { font-size: 1.0625rem; margin: 3rem 0 .5rem; font-weight: 600; }
+h3 { font-size: 1rem; margin: 0; font-weight: 600; }
+
+p { margin: 0 0 1rem; }
+
+a { color: var(--accent); text-underline-offset: 3px; }
+
+/* Visible keyboard focus — important for accessibility. */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.muted { color: var(--muted); }
+.small { font-size: .875rem; }
+
+/* --- Header / nav ------------------------------------------- */
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem 1.5rem;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 1.75rem 0 1.1rem;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 2.5rem;
+}
+
+.site-title {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.header-right { display: flex; align-items: baseline; gap: 1.5rem; flex-wrap: wrap; }
+
+.site-nav { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+.site-nav a { color: var(--muted); text-decoration: none; font-size: .9375rem; }
+.site-nav a:hover { color: var(--fg); }
+/* The current page's link is marked with class="here" in the HTML. */
+.site-nav a.here { color: var(--fg); font-weight: 500; }
+
+/* --- Theme toggle ------------------------------------------
+   Three plain text buttons: System / Light / Dark. Square, to
+   match the panels. JS in js/theme.js does the actual switching
+   and sets aria-pressed on whichever one is active. */
+.theme-toggle {
+  display: flex;
+  border: 1px solid var(--rule);
+  border-radius: 999px;   /* rounded ends, so the three read as one pill */
+  overflow: hidden;       /* clips each button's hover fill to the curve */
+  font-size: .75rem;
+  line-height: 1;
+}
+
+.theme-toggle button {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-left: 1px solid var(--rule);
+  color: var(--muted);
+  font: inherit;
+  font-family: var(--font);
+  padding: .3rem .55rem;
+  cursor: pointer;
+  transition: background-color .12s ease-out, color .12s ease-out;
+}
+/* The end segments need a little more room so their labels
+   don't crowd the curve. The dividers between them stay straight. */
+.theme-toggle button:first-child { border-left: 0; padding-left: .75rem; }
+.theme-toggle button:last-child  { padding-right: .75rem; }
+.theme-toggle button:hover { background: var(--bg-alt); color: var(--fg); }
+.theme-toggle button[aria-pressed="true"] { background: var(--bg-alt); color: var(--fg); }
+
+/* Before JS runs there is no active button; don't flash a wrong one. */
+.theme-toggle:not(.ready) button[aria-pressed="true"] { background: transparent; color: var(--muted); }
+
+/* --- Footer ------------------------------------------------- */
+.site-footer {
+  margin-top: 4rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: .8125rem;
+}
+
+/* --- Panels -------------------------------------------------
+   A .panel is a stack of .row items separated by hairlines.
+   Square corners, no outline box, nothing floating. Hovering a
+   row fills it edge to edge — the fill runs past the text on
+   the left and right (no side borders), while the top and
+   bottom stay crisp against the separator lines. */
+.panel { margin: 1.25rem 0; border-bottom: 1px solid var(--rule); }
+
+.row {
+  display: block;
+  border-top: 1px solid var(--rule);
+  padding: 1rem var(--pad);
+  /* pull the row out sideways so its hover fill is wider than the text */
+  margin-inline: calc(-1 * var(--pad));
+  background: transparent;
+  transition: background-color .12s ease-out;
+}
+.row:hover { background: var(--bg-alt); }
+
+/* A whole row that is itself a link. */
+a.row { color: inherit; text-decoration: none; }
+
+.row-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .15rem 1rem;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.row-head .when { color: var(--muted); font-size: .875rem; white-space: nowrap; }
+
+.row p { margin: .35rem 0 0; color: var(--muted); font-size: .9375rem; }
+.row ul { margin: .45rem 0 0; padding-left: 1.1rem; color: var(--muted); font-size: .9375rem; }
+.row li { margin-bottom: .25rem; }
+.row li::marker { color: var(--rule); }
+
+/* Tags for tech/skills — rounded, unlike the panels. */
+.tags { display: flex; flex-wrap: wrap; gap: .35rem; padding: 0; margin: .6rem 0 0; list-style: none; }
+.tags li {
+  font-family: var(--font-mono);
+  font-size: .75rem;
+  color: var(--muted);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: .1rem .6rem;
+}
+
+/* A row of plain links, e.g. under the intro on the home page. */
+.links { display: flex; flex-wrap: wrap; gap: 1.25rem; padding: 0; margin: 1.5rem 0 0; list-style: none; }
+
+/* A two-column label/value list, used on the contact page. */
+.deflist { display: grid; grid-template-columns: max-content 1fr; gap: .5rem 1.5rem; margin: 0; }
+.deflist dt { color: var(--muted); }
+.deflist dd { margin: 0; }
+
+@media (max-width: 30rem) {
+  .deflist { grid-template-columns: 1fr; gap: 0; }
+  .deflist dd { margin-bottom: .85rem; }
+  h1 { font-size: 1.875rem; }
+}
+
+/* --- Printing (so the resume saves to a clean PDF) ---------- */
+@media print {
+  :root { --bg: #fff; --bg-alt: #fff; --fg: #000; --muted: #333; --rule: #bbb; --accent: #000; }
+  body { font-size: 10pt; padding: 0; }
+  .site-header, .site-footer, .theme-toggle, .no-print { display: none; }
+  .wrap { max-width: none; }
+  a { text-decoration: none; }
+  .row { break-inside: avoid; padding: .5rem 0; margin-inline: 0; }
+  h2 { margin-top: 1.2rem; }
+}
