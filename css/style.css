@@ -91,9 +91,13 @@ a { color: var(--accent); text-underline-offset: 3px; }
   gap: .5rem 1.5rem;
   align-items: baseline;
   justify-content: space-between;
-  padding: 1.75rem 0 1.1rem;
+  /* Negative margin + equal padding: the box (and so the rule under it)
+     runs --pad wider on each side, while the content inside stays lined
+     up with the body text. Every hairline on the site uses this trick,
+     so they're all the same length. */
+  margin: 0 calc(-1 * var(--pad)) 2.5rem;
+  padding: 1.75rem var(--pad) 1.1rem;
   border-bottom: 1px solid var(--rule);
-  margin-bottom: 2.5rem;
 }
 
 .site-title {
@@ -148,8 +152,8 @@ a { color: var(--accent); text-underline-offset: 3px; }
 
 /* --- Footer ------------------------------------------------- */
 .site-footer {
-  margin-top: 4rem;
-  padding-top: 1.1rem;
+  margin: 4rem calc(-1 * var(--pad)) 0;
+  padding: 1.1rem var(--pad) 0;
   border-top: 1px solid var(--rule);
   color: var(--muted);
   font-size: .8125rem;
@@ -161,14 +165,12 @@ a { color: var(--accent); text-underline-offset: 3px; }
    row fills it edge to edge — the fill runs past the text on
    the left and right (no side borders), while the top and
    bottom stay crisp against the separator lines. */
-.panel { margin: 1.25rem 0; border-bottom: 1px solid var(--rule); }
+.panel { margin: 1.25rem calc(-1 * var(--pad)); border-bottom: 1px solid var(--rule); }
 
 .row {
   display: block;
   border-top: 1px solid var(--rule);
   padding: 1rem var(--pad);
-  /* pull the row out sideways so its hover fill is wider than the text */
-  margin-inline: calc(-1 * var(--pad));
   background: transparent;
   transition: background-color .12s ease-out;
 }
@@ -187,12 +189,15 @@ a.row { color: inherit; text-decoration: none; }
 .row-head .when { color: var(--muted); font-size: .875rem; white-space: nowrap; }
 
 .row p { margin: .35rem 0 0; color: var(--muted); font-size: .9375rem; }
-.row ul { margin: .45rem 0 0; padding-left: 1.1rem; color: var(--muted); font-size: .9375rem; }
-.row li { margin-bottom: .25rem; }
-.row li::marker { color: var(--rule); }
+/* Bullet lists inside a row. The :not(.tags) matters — without it
+   these rules outrank .tags below (more specific) and push the tag
+   pills in by the bullet indent. */
+.row ul:not(.tags) { margin: .45rem 0 0; padding-left: 1.1rem; color: var(--muted); font-size: .9375rem; }
+.row ul:not(.tags) li { margin-bottom: .25rem; }
+.row ul:not(.tags) li::marker { color: var(--rule); }
 
 /* Tags for tech/skills — rounded, unlike the panels. */
-.tags { display: flex; flex-wrap: wrap; gap: .35rem; padding: 0; margin: .6rem 0 0; list-style: none; }
+.tags { display: flex; flex-wrap: wrap; gap: .35rem; padding-left: 0; margin: .6rem 0 0; list-style: none; }
 .tags li {
   font-family: var(--font-mono);
   font-size: .75rem;
@@ -223,6 +228,7 @@ a.row { color: inherit; text-decoration: none; }
   .site-header, .site-footer, .theme-toggle, .no-print { display: none; }
   .wrap { max-width: none; }
   a { text-decoration: none; }
-  .row { break-inside: avoid; padding: .5rem 0; margin-inline: 0; }
+  .panel { margin-inline: 0; }
+  .row { break-inside: avoid; padding: .5rem 0; }
   h2 { margin-top: 1.2rem; }
 }
