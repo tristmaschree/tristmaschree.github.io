@@ -1,7 +1,6 @@
 # tristmaschree.github.io
 
-Personal site. Plain HTML and CSS — there is no build step, no dependencies,
-and nothing to install. Editing a file and pushing it is the entire workflow.
+Personal site. Plain HTML and CSS very barebones.
 
 Live at <https://tristmaschree.github.io>.
 
