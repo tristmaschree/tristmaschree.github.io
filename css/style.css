@@ -150,6 +150,35 @@ a { color: var(--accent); text-underline-offset: 3px; }
 /* Before JS runs there is no active button; don't flash a wrong one. */
 .theme-toggle:not(.ready) button[aria-pressed="true"] { background: transparent; color: var(--muted); }
 
+/* --- Header on phones ---------------------------------------
+   Below this width the desktop row can't fit, and plain wrapping
+   stacks title / nav / toggle into three lines. Instead: title and
+   toggle share the top row, nav gets the full row underneath.
+   display: contents dissolves .header-right so its two children can
+   be placed on the header's grid directly. */
+@media (max-width: 40rem) {
+  .site-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "title  toggle"
+      "nav    nav";
+    align-items: center;
+    row-gap: .9rem;
+    padding-top: 1.25rem;
+    margin-bottom: 2rem;
+  }
+  .header-right { display: contents; }
+  .site-title   { grid-area: title; }
+  .theme-toggle { grid-area: toggle; }
+  .site-nav     { grid-area: nav; gap: 1.25rem; }
+
+  /* Slightly larger tap targets for thumbs. */
+  .theme-toggle button { padding: .4rem .6rem; }
+  .theme-toggle button:first-child { padding-left: .8rem; }
+  .theme-toggle button:last-child  { padding-right: .8rem; }
+}
+
 /* --- Footer ------------------------------------------------- */
 .site-footer {
   margin: 4rem calc(-1 * var(--pad)) 0;
