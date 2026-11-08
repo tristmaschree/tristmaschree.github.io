@@ -1,60 +1,58 @@
-/* theme.js — the System / Light / Dark switch in the top right.
+/* theme.js — the round theme button in the header.
  *
  * Loaded from <head> WITHOUT defer, so it runs before the page paints
  * and there's no flash of the wrong theme.
  *
- * How it works: it puts data-theme="light" or "dark" on the <html>
- * element, and css/style.css keys off that. "System" removes the
- * attribute entirely, which lets the OS setting take over again.
+ * Each click moves System → Light → Dark → System. Light and Dark put
+ * data-theme="light" or "dark" on <html>, which css/style.css keys off.
+ * System removes the attribute so the OS setting takes over again.
  */
 (function () {
   var KEY = 'theme';
+  var ORDER = ['system', 'light', 'dark'];
+  var NAMES = { system: 'System', light: 'Light', dark: 'Dark' };
 
   // localStorage can throw (private windows, blocked cookies), so every
   // read and write is wrapped. The site must work without it.
   function read() {
-    try { return localStorage.getItem(KEY); } catch (e) { return null; }
+    try { return localStorage.getItem(KEY) || 'system'; } catch (e) { return 'system'; }
   }
   function write(v) {
-    try { v ? localStorage.setItem(KEY, v) : localStorage.removeItem(KEY); } catch (e) {}
+    try { v === 'system' ? localStorage.removeItem(KEY) : localStorage.setItem(KEY, v); } catch (e) {}
   }
 
-  function apply(choice) {
-    if (choice === 'light' || choice === 'dark') {
-      document.documentElement.setAttribute('data-theme', choice);
+  function apply(mode) {
+    if (mode === 'light' || mode === 'dark') {
+      document.documentElement.setAttribute('data-theme', mode);
     } else {
       document.documentElement.removeAttribute('data-theme');
     }
   }
 
   // Run immediately, before first paint.
-  apply(read());
+  var mode = read();
+  apply(mode);
 
-  // Then wire up the buttons once the header exists.
+  // Then wire up the button once the header exists.
   document.addEventListener('DOMContentLoaded', function () {
-    var group = document.querySelector('.theme-toggle');
-    if (!group) return;
-
-    var buttons = group.querySelectorAll('button[data-theme-set]');
+    var button = document.querySelector('.theme-button');
+    if (!button) return;
 
     function sync() {
-      var current = read() || 'system';
-      for (var i = 0; i < buttons.length; i++) {
-        var b = buttons[i];
-        b.setAttribute('aria-pressed', String(b.dataset.themeSet === current));
-      }
+      // The icon shows the current mode; the label says what it is.
+      button.dataset.mode = mode;
+      var label = 'Theme: ' + NAMES[mode];
+      button.setAttribute('aria-label', label);
+      button.title = label;
     }
 
-    for (var i = 0; i < buttons.length; i++) {
-      buttons[i].addEventListener('click', function () {
-        var choice = this.dataset.themeSet;
-        write(choice === 'system' ? null : choice);
-        apply(choice);
-        sync();
-      });
-    }
+    button.addEventListener('click', function () {
+      mode = ORDER[(ORDER.indexOf(mode) + 1) % ORDER.length];
+      write(mode);
+      apply(mode);
+      sync();
+    });
 
     sync();
-    group.classList.add('ready');
   });
 })();

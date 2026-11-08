@@ -17,16 +17,16 @@
   --measure:   72ch;      /* max line length for comfortable reading */
   --gutter:    1.25rem;   /* space at the screen edges */
   --pad:       1rem;      /* side padding inside a panel row */
+  --sidebar:   10rem;     /* width of the left column on wide screens */
 
   /* San Francisco on Apple devices, sensible fallbacks elsewhere. */
   --font:      -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 }
 
 /* Dark mode: same tokens, Apple's dark values.
    Two ways in, and the order matters:
    1. the visitor's OS is set to dark AND they haven't forced light here;
-   2. they picked Dark from the toggle, which sets data-theme on <html>. */
+   2. they picked Dark with the theme button, which sets data-theme on <html>. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
   --bg:     #000000;
@@ -66,11 +66,24 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Everything sits inside this centred column. */
-.wrap { max-width: var(--measure); margin: 0 auto; }
+/* --- Page layout -------------------------------------------
+   Wide screens: a sidebar on the left (picture, nav, theme
+   button) and the content column on the right. Phones: the
+   sidebar folds into a bar across the top (see further down). */
+.wrap {
+  display: grid;
+  grid-template-columns: var(--sidebar) minmax(0, var(--measure));
+  gap: 3.5rem;
+  justify-content: center;
+  margin-top: 6rem;
+}
+.content { min-width: 0; }
 
 h1, h2, h3 { line-height: 1.2; text-wrap: balance; }
-h1 { font-size: 2.25rem; margin: 0 0 .35rem; letter-spacing: -.025em; font-weight: 600; }
+h1 { font-size: 2rem; margin: 0 0 2.5rem; letter-spacing: -.025em; font-weight: 600; }
+/* A subtitle straight after the title tucks up under it instead. */
+h1:has(+ .muted) { margin-bottom: .35rem; }
+h1 + .muted { margin-bottom: 2.5rem; }
 h2 { font-size: 1.0625rem; margin: 3rem 0 .5rem; font-weight: 600; }
 h3 { font-size: 1rem; margin: 0; font-weight: 600; }
 
@@ -84,123 +97,136 @@ a { color: var(--accent); text-underline-offset: 3px; }
 .muted { color: var(--muted); }
 .small { font-size: .875rem; }
 
-/* --- Header / nav ------------------------------------------- */
+/* --- Sidebar ----------------------------------------------- */
 .site-header {
+  position: sticky;
+  top: 6rem;
+  align-self: start;
   display: flex;
-  flex-wrap: wrap;
-  gap: .5rem 1.5rem;
-  align-items: baseline;
-  justify-content: space-between;
-  /* Negative margin + equal padding: the box (and so the rule under it)
-     runs --pad wider on each side, while the content inside stays lined
-     up with the body text. Every hairline on the site uses this trick,
-     so they're all the same length. */
-  margin: 0 calc(-1 * var(--pad)) 2.5rem;
-  padding: 1.75rem var(--pad) 1.1rem;
-  border-bottom: 1px solid var(--rule);
+  flex-direction: column;
+  align-items: flex-start;
 }
 
-.site-title {
-  font-weight: 600;
-  font-size: 1rem;
-  color: var(--fg);
-  text-decoration: none;
-}
+/* Profile picture, which doubles as the home link. */
+.avatar { display: block; margin-bottom: 2.75rem; border-radius: 999px; transition: opacity .12s ease-out; }
+.avatar img { display: block; width: 2.5rem; height: 2.5rem; border-radius: 999px; }
+.avatar:hover { opacity: .85; }
 
-.header-right { display: flex; align-items: baseline; gap: 1.5rem; flex-wrap: wrap; }
-
-.site-nav { display: flex; gap: 1.5rem; flex-wrap: wrap; }
-.site-nav a { color: var(--muted); text-decoration: none; font-size: .9375rem; }
-.site-nav a:hover { color: var(--fg); }
-/* The current page's link is marked with class="here" in the HTML. */
-.site-nav a.here { color: var(--fg); font-weight: 500; }
-
-/* --- Theme toggle ------------------------------------------
-   Three plain text buttons: System / Light / Dark. Square, to
-   match the panels. JS in js/theme.js does the actual switching
-   and sets aria-pressed on whichever one is active. */
-.theme-toggle {
-  display: flex;
-  border: 1px solid var(--rule);
-  border-radius: 999px;   /* rounded ends, so the three read as one pill */
-  overflow: hidden;       /* clips each button's hover fill to the curve */
-  font-size: .75rem;
-  line-height: 1;
-}
-
-.theme-toggle button {
-  appearance: none;
-  background: transparent;
-  border: 0;
-  border-left: 1px solid var(--rule);
+.site-nav { display: flex; flex-direction: column; gap: .35rem; }
+.site-nav a {
+  position: relative;
   color: var(--muted);
-  font: inherit;
-  font-family: var(--font);
-  padding: .3rem .55rem;
-  cursor: pointer;
-  transition: background-color .12s ease-out, color .12s ease-out;
+  text-decoration: none;
+  font-size: .9375rem;
+  transition: color .12s ease-out;
 }
-/* The end segments need a little more room so their labels
-   don't crowd the curve. The dividers between them stay straight. */
-.theme-toggle button:first-child { border-left: 0; padding-left: .75rem; }
-.theme-toggle button:last-child  { padding-right: .75rem; }
-.theme-toggle button:hover { background: var(--bg-alt); color: var(--fg); }
-.theme-toggle button[aria-pressed="true"] { background: var(--bg-alt); color: var(--fg); }
+.site-nav a:hover { color: var(--fg); }
 
-/* Before JS runs there is no active button; don't flash a wrong one. */
-.theme-toggle:not(.ready) button[aria-pressed="true"] { background: transparent; color: var(--muted); }
+/* The current page: darker text plus a small blue dot. In the
+   sidebar the dot hangs just left of the label; on phones, where
+   the nav runs across the top, it sits centred underneath. This is
+   the site's one "you are here" marker. */
+.site-nav a::before {
+  content: "";
+  position: absolute;
+  left: -.8rem;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--accent);
+  transform: translateY(-50%) scale(0);
+  transition: transform .15s ease-out;
+}
+.site-nav a.here { color: var(--fg); font-weight: 500; }
+.site-nav a.here::before { transform: translateY(-50%) scale(1); }
 
-/* --- Header on phones ---------------------------------------
-   Below this width the desktop row can't fit, and plain wrapping
-   stacks title / nav / toggle into three lines. Instead: title and
-   toggle share the top row, nav gets the full row underneath.
-   display: contents dissolves .header-right so its two children can
-   be placed on the header's grid directly. */
-@media (max-width: 40rem) {
+.site-header .theme-button { margin-top: 2.75rem; }
+
+/* --- Icon buttons -------------------------------------------
+   Bare icons for the theme button in the sidebar and the social
+   links in the footer. No outline and no hover fill: like the nav
+   links, they just darken to full text colour on hover. The
+   padding gives a comfortable click area without drawing a box. */
+.icon-button {
+  appearance: none;
+  display: grid;
+  place-items: center;
+  padding: .45rem;
+  margin: -.45rem;      /* cancels the padding so the icon lines up with text */
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color .12s ease-out;
+}
+.icon-button:hover { color: var(--fg); }
+.icon-button svg { width: 1.125rem; height: 1.125rem; }
+
+/* The theme button holds all three icons and shows the one for the
+   current mode. Its outline icons are drawn with strokes. */
+.theme-button svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.theme-button svg { display: none; }
+.theme-button[data-mode="system"] .i-system,
+.theme-button[data-mode="light"]  .i-light,
+.theme-button[data-mode="dark"]   .i-dark { display: block; }
+
+/* --- Phones and narrow windows ------------------------------
+   The sidebar becomes a bar across the top: picture on the left
+   and theme button on the right of the first row, the nav along
+   the second. */
+@media (max-width: 48rem) {
+  .wrap { display: block; margin-top: 0; }
   .site-header {
+    position: static;
     display: grid;
     grid-template-columns: 1fr auto;
     grid-template-areas:
-      "title  toggle"
-      "nav    nav";
+      "avatar  theme"
+      "nav     nav";
     align-items: center;
-    row-gap: .9rem;
-    padding-top: 1.25rem;
-    margin-bottom: 2rem;
+    row-gap: 1rem;
+    margin: 0 calc(-1 * var(--pad)) 2.5rem;
+    padding: 1.25rem var(--pad) 1rem;
+    border-bottom: 1px solid var(--rule);
   }
-  .header-right { display: contents; }
-  .site-title   { grid-area: title; }
-  .theme-toggle { grid-area: toggle; }
-  .site-nav     { grid-area: nav; gap: 1.25rem; }
+  .avatar { grid-area: avatar; margin: 0; }
+  .site-header .theme-button { grid-area: theme; margin: 0; }
+  .site-nav { grid-area: nav; flex-direction: row; flex-wrap: wrap; gap: .5rem 1.6rem; padding-bottom: .4rem; }
 
-  /* Slightly larger tap targets for thumbs. */
-  .theme-toggle button { padding: .4rem .6rem; }
-  .theme-toggle button:first-child { padding-left: .8rem; }
-  .theme-toggle button:last-child  { padding-right: .8rem; }
+  /* Dot moves from beside the label to centred below it. */
+  .site-nav a::before { left: 50%; top: auto; bottom: -.45rem; transform: translateX(-50%) scale(0); }
+  .site-nav a.here::before { transform: translateX(-50%) scale(1); }
 }
 
 /* --- Footer ------------------------------------------------- */
 .site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
   margin: 4rem calc(-1 * var(--pad)) 0;
   padding: 1.1rem var(--pad) 0;
   border-top: 1px solid var(--rule);
   color: var(--muted);
   font-size: .8125rem;
 }
+.site-footer p { margin: 0; }
+
+.socials { display: flex; gap: 1.4rem; margin: 0; padding: 0; list-style: none; }
 
 /* --- Panels -------------------------------------------------
    A .panel is a stack of .row items separated by hairlines.
    Square corners, no outline box, nothing floating. Hovering a
-   row fills it edge to edge — the fill runs past the text on
-   the left and right (no side borders), while the top and
-   bottom stay crisp against the separator lines. */
+   row fills it with a flat colour, exactly as wide as the
+   hairlines above and below it. */
 .panel { margin: 1.25rem calc(-1 * var(--pad)); border-bottom: 1px solid var(--rule); }
 
 .row {
   display: block;
   border-top: 1px solid var(--rule);
   padding: 1rem var(--pad);
-  background: transparent;
   transition: background-color .12s ease-out;
 }
 .row:hover { background: var(--bg-alt); }
@@ -219,25 +245,36 @@ a.row { color: inherit; text-decoration: none; }
 
 .row p { margin: .35rem 0 0; color: var(--muted); font-size: .9375rem; }
 /* Bullet lists inside a row. The :not(.tags) matters — without it
-   these rules outrank .tags below (more specific) and push the tag
-   pills in by the bullet indent. */
+   these rules outrank .tags below (more specific) and push the tags
+   in by the bullet indent. */
 .row ul:not(.tags) { margin: .45rem 0 0; padding-left: 1.1rem; color: var(--muted); font-size: .9375rem; }
 .row ul:not(.tags) li { margin-bottom: .25rem; }
 .row ul:not(.tags) li::marker { color: var(--rule); }
 
-/* Tags for tech/skills — rounded, unlike the panels. */
-.tags { display: flex; flex-wrap: wrap; gap: .35rem; padding-left: 0; margin: .6rem 0 0; list-style: none; }
-.tags li {
-  font-family: var(--font-mono);
-  font-size: .75rem;
+/* Topic tags under a project: one line of text with a thin
+   divider between each tag. */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  row-gap: .2rem;
+  padding: 0;
+  margin: .6rem 0 0;
+  list-style: none;
+  font-size: .8125rem;
+  font-weight: 500;
   color: var(--muted);
-  border: 1px solid var(--rule);
-  border-radius: 999px;
-  padding: .1rem .6rem;
 }
-
-/* A row of plain links, e.g. under the intro on the home page. */
-.links { display: flex; flex-wrap: wrap; gap: 1.25rem; padding: 0; margin: 1.5rem 0 0; list-style: none; }
+.tags li + li::before {
+  content: "";
+  display: inline-block;
+  width: 1px;
+  height: .8em;
+  margin: 0 .65rem;
+  vertical-align: -.05em;
+  background: var(--muted);
+  opacity: .6;
+}
 
 /* A two-column label/value list, used on the contact page. */
 .deflist { display: grid; grid-template-columns: max-content 1fr; gap: .5rem 1.5rem; margin: 0; }
@@ -247,16 +284,17 @@ a.row { color: inherit; text-decoration: none; }
 @media (max-width: 30rem) {
   .deflist { grid-template-columns: 1fr; gap: 0; }
   .deflist dd { margin-bottom: .85rem; }
-  h1 { font-size: 1.875rem; }
+  h1 { font-size: 1.75rem; }
 }
 
 /* --- Printing (so the resume saves to a clean PDF) ---------- */
 @media print {
   :root { --bg: #fff; --bg-alt: #fff; --fg: #000; --muted: #333; --rule: #bbb; --accent: #000; }
   body { font-size: 10pt; padding: 0; }
-  .site-header, .site-footer, .theme-toggle, .no-print { display: none; }
-  .wrap { max-width: none; }
+  .site-header, .site-footer, .no-print { display: none; }
+  .wrap { display: block; margin: 0; }
   a { text-decoration: none; }
+  h1 { font-size: 16pt; margin-bottom: .2rem; }
   .panel { margin-inline: 0; }
   .row { break-inside: avoid; padding: .5rem 0; }
   h2 { margin-top: 1.2rem; }
