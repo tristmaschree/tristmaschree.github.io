@@ -54,7 +54,9 @@
     </p>
 
     <p>
-      Outside of that, most of my free time goes to music, movies, and tennis (I'm getting better at it).
+      <!-- Easter egg: hover (or tap on a phone) swaps the phrase for "pun intended",
+           since the paragraph above is about looking at models from the inside. -->
+      <button type="button" class="pun"><span class="pun-text">Outside of that</span><span class="pun-alt" aria-hidden="true">pun intended</span></button>, most of my free time goes to music, movies, and tennis (I'm getting better at it).
     </p>
 
     <h2>Some of my work</h2>
@@ -98,6 +100,23 @@
     </div>
     <p class="small"><a href="projects.html">All projects →</a></p>
   </main>
+
+    <script>
+      // Easter egg on phones and keyboards: tap or press to show "pun intended",
+      // tap again or wait 2.5 seconds to switch back. A mouse uses hover instead.
+      (function () {
+        var pun = document.querySelector('.pun');
+        if (!pun) return;
+        var timer;
+        pun.addEventListener('click', function (e) {
+          if (e.pointerType === 'mouse') return;
+          clearTimeout(timer);
+          var on = !pun.classList.contains('show');
+          pun.classList.toggle('show', on);
+          if (on) timer = setTimeout(function () { pun.classList.remove('show'); }, 2500);
+        });
+      })();
+    </script>
 
     <footer class="site-footer">
       <p>© 2026 Josh Yu · <a href="https://github.com/tristmaschree/tristmaschree.github.io">Source</a></p>

@@ -303,6 +303,22 @@ a.row { color: inherit; text-decoration: none; }
   opacity: .6;
 }
 
+/* --- Easter egg on the home page ----------------------------
+   "Outside of that" and "pun intended" sit stacked in the same
+   spot, so swapping them doesn't move the rest of the sentence.
+   It's a button only so taps and the keyboard work; it looks
+   like plain text. */
+.pun {
+  all: unset;
+  display: inline-grid;
+  cursor: default;
+}
+.pun > span { grid-area: 1 / 1; transition: opacity var(--speed) ease-out; }
+.pun-alt { opacity: 0; color: var(--muted); }
+.pun.show .pun-text { opacity: 0; }
+.pun.show .pun-alt  { opacity: 1; }
+.pun:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
 /* A two-column label/value list, used on the contact page. */
 .deflist { display: grid; grid-template-columns: max-content 1fr; gap: .5rem 1.5rem; margin: 0; }
 .deflist dt { color: var(--muted); }
@@ -332,6 +348,9 @@ a.row { color: inherit; text-decoration: none; }
   html:not(.touching) a.row:hover p { color: var(--fg); }
 
   html:not(.touching) .icon-button:hover { color: var(--fg); }
+
+  html:not(.touching) .pun:hover .pun-text { opacity: 0; }
+  html:not(.touching) .pun:hover .pun-alt  { opacity: 1; }
 }
 
 /* --- Printing (so the resume saves to a clean PDF) ---------- */
