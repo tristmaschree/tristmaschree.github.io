@@ -107,9 +107,13 @@
       (function () {
         var pun = document.querySelector('.pun');
         if (!pun) return;
-        var timer;
-        pun.addEventListener('click', function (e) {
-          if (e.pointerType === 'mouse') return;
+        var timer, pressedWith = '';
+        // Note what started the press; Safari doesn't reliably say on the click itself.
+        pun.addEventListener('pointerdown', function (e) { pressedWith = e.pointerType; });
+        pun.addEventListener('click', function () {
+          var mouse = pressedWith === 'mouse';
+          pressedWith = '';            // a keyboard press has no pointerdown before it
+          if (mouse) return;
           clearTimeout(timer);
           var on = !pun.classList.contains('show');
           pun.classList.toggle('show', on);

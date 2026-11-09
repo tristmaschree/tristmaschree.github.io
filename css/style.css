@@ -314,6 +314,9 @@ a.row { color: inherit; text-decoration: none; }
   all: unset;
   display: inline-grid;
   cursor: default;
+  -webkit-tap-highlight-color: transparent;   /* no grey flash when tapped on iPhone */
+  -webkit-user-select: none;                  /* a long press shouldn't start selecting it */
+  user-select: none;
 }
 .pun > span { grid-area: 1 / 1; }
 .pun-alt { opacity: 0; color: var(--muted); justify-self: center; }
