@@ -1,5 +1,6 @@
 /* theme.js — the theme button (one copy in the phone header,
- * one in the desktop footer; only one is visible at a time).
+ * one in the desktop footer; only one is visible at a time), plus
+ * a small touch check that keeps hover effects off touchscreens.
  *
  * Loaded from <head> WITHOUT defer, so it runs before the page paints
  * and there's no flash of the wrong theme.
@@ -33,6 +34,18 @@
   // Run immediately, before first paint.
   var mode = read();
   apply(mode);
+
+  // Hover effects are for a mouse or trackpad only (see "Hover effects"
+  // in css/style.css). On a laptop with a touchscreen, mark the page
+  // while it's being touched so a tap doesn't trigger them, and unmark
+  // it as soon as a mouse or trackpad is used again.
+  var root = document.documentElement;
+  window.addEventListener('pointerdown', function (e) {
+    root.classList.toggle('touching', e.pointerType === 'touch');
+  }, { passive: true });
+  window.addEventListener('pointermove', function (e) {
+    if (e.pointerType === 'mouse') root.classList.remove('touching');
+  }, { passive: true });
 
   // Then wire up the buttons once the page exists.
   document.addEventListener('DOMContentLoaded', function () {
