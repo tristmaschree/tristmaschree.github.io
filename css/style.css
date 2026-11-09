@@ -118,19 +118,26 @@ a { color: var(--accent); text-underline-offset: 3px; }
   gap: 1.25rem;
 }
 
-/* Picture, name and one line about me; the whole card is the home link. */
+/* Picture, name and one line about me; the whole card is the home link.
+   Hover rules across the site, one per kind of element:
+   - goes to another page here (card, nav, home rows): grows a little
+     and any grey text brightens;
+   - icons: brighten only (growth at icon size looks twitchy);
+   - blue text links: stay as they are, underlined. */
 .card {
   display: grid;
   gap: .1rem;
   color: var(--fg);
   text-decoration: none;
-  transition: opacity var(--speed) ease-out;
+  transform-origin: left center;
+  transition: transform var(--speed) ease-out;
 }
-.card:hover { opacity: .8; }
+.card:hover { transform: scale(1.03); }
 .card img { display: block; width: 3rem; height: 3rem; border-radius: 999px; margin-bottom: .65rem; }
 .card-text { display: grid; gap: .1rem; }
 .card-name { font-weight: 600; font-size: 1.0625rem; line-height: 1.3; }
-.card-sub  { color: var(--muted); font-size: .8125rem; line-height: 1.4; }
+.card-sub  { color: var(--muted); font-size: .8125rem; line-height: 1.4; transition: color var(--speed) ease-out; }
+.card:hover .card-sub { color: var(--fg); }
 
 .site-header .site-nav,
 .card-links { padding-top: 1.25rem; border-top: 1px solid var(--rule); }
