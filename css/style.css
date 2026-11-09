@@ -172,30 +172,27 @@ a { color: var(--accent); text-underline-offset: 3px; }
 .theme-button[data-mode="dark"]   .i-dark { display: block; }
 
 /* --- Phones and narrow windows ------------------------------
-   The sidebar becomes a bar across the top: picture on the left
-   and theme button on the right of the first row, the nav along
-   the second. */
+   The sidebar becomes a single bar across the top: picture on
+   the left, then the tabs, then the theme icon. The current-tab
+   dot sits centred under its label, inside the bar's bottom
+   padding, so it doesn't add a row of its own. */
 @media (max-width: 48rem) {
   .wrap { display: block; margin-top: 0; }
   .site-header {
     position: static;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-areas:
-      "avatar  theme"
-      "nav     nav";
+    flex-direction: row;
     align-items: center;
-    row-gap: 1rem;
+    gap: 1.25rem;
     margin: 0 calc(-1 * var(--pad)) 2.5rem;
-    padding: 1.25rem var(--pad) 1rem;
+    padding: 1rem var(--pad) .9rem;
     border-bottom: 1px solid var(--rule);
   }
-  .avatar { grid-area: avatar; margin: 0; }
-  .site-header .theme-button { grid-area: theme; margin: 0; }
-  .site-nav { grid-area: nav; flex-direction: row; flex-wrap: wrap; gap: .5rem 1.6rem; padding-bottom: .4rem; }
+  .avatar { margin: 0 auto 0 0; }   /* pushes the tabs and icon to the right */
+  .avatar img { width: 2rem; height: 2rem; }
+  .site-nav { flex-direction: row; gap: 1.25rem; }
+  .site-header .theme-button { margin: -.45rem; }
 
-  /* Dot moves from beside the label to centred below it. */
-  .site-nav a::before { left: 50%; top: auto; bottom: -.45rem; transform: translateX(-50%) scale(0); }
+  .site-nav a::before { left: 50%; top: auto; bottom: -.55rem; transform: translateX(-50%) scale(0); }
   .site-nav a.here::before { transform: translateX(-50%) scale(1); }
 }
 
