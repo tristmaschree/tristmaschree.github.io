@@ -1,4 +1,5 @@
-/* theme.js — the round theme button in the header.
+/* theme.js — the theme button (one copy in the phone header,
+ * one in the desktop footer; only one is visible at a time).
  *
  * Loaded from <head> WITHOUT defer, so it runs before the page paints
  * and there's no flash of the wrong theme.
@@ -33,25 +34,28 @@
   var mode = read();
   apply(mode);
 
-  // Then wire up the button once the header exists.
+  // Then wire up the buttons once the page exists.
   document.addEventListener('DOMContentLoaded', function () {
-    var button = document.querySelector('.theme-button');
-    if (!button) return;
+    var buttons = document.querySelectorAll('.theme-button');
 
     function sync() {
-      // The icon shows the current mode; the label says what it is.
-      button.dataset.mode = mode;
+      // Each icon shows the current mode; the label says what it is.
       var label = 'Theme: ' + NAMES[mode];
-      button.setAttribute('aria-label', label);
-      button.title = label;
+      for (var i = 0; i < buttons.length; i++) {
+        buttons[i].dataset.mode = mode;
+        buttons[i].setAttribute('aria-label', label);
+        buttons[i].title = label;
+      }
     }
 
-    button.addEventListener('click', function () {
-      mode = ORDER[(ORDER.indexOf(mode) + 1) % ORDER.length];
-      write(mode);
-      apply(mode);
-      sync();
-    });
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].addEventListener('click', function () {
+        mode = ORDER[(ORDER.indexOf(mode) + 1) % ORDER.length];
+        write(mode);
+        apply(mode);
+        sync();
+      });
+    }
 
     sync();
   });

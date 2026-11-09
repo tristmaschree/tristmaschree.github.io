@@ -17,7 +17,11 @@
   --measure:   72ch;      /* max line length for comfortable reading */
   --gutter:    1.25rem;   /* space at the screen edges */
   --pad:       1rem;      /* side padding inside a panel row */
-  --sidebar:   10rem;     /* width of the left column on wide screens */
+  /* One speed for every hover on the site. Small state changes like
+     hover read best at roughly 100-200ms; 150ms feels responsive
+     without snapping. */
+  --speed:     150ms;
+  --sidebar:   11.5rem;     /* width of the left column on wide screens */
 
   /* San Francisco on Apple devices, sensible fallbacks elsewhere. */
   --font:      -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -67,8 +71,8 @@ body {
 }
 
 /* --- Page layout -------------------------------------------
-   Wide screens: a sidebar on the left (picture, nav, theme
-   button) and the content column on the right. Phones: the
+   Wide screens: a profile card on the left (picture, name,
+   pages, links) and the content column on the right. Phones: the
    sidebar folds into a bar across the top (see further down). */
 .wrap {
   display: grid;
@@ -91,57 +95,63 @@ p { margin: 0 0 1rem; }
 
 a { color: var(--accent); text-underline-offset: 3px; }
 
+/* Visitors who ask their OS for reduced motion get instant changes. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
+}
+
 /* Visible keyboard focus — important for accessibility. */
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .muted { color: var(--muted); }
 .small { font-size: .875rem; }
 
-/* --- Sidebar ----------------------------------------------- */
+/* --- Profile card (the sidebar) ----------------------------
+   Three stacked parts divided by hairlines: who I am, the
+   pages, and my links plus the theme button. */
 .site-header {
   position: sticky;
   top: 6rem;
   align-self: start;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  gap: 1.25rem;
 }
 
-/* Profile picture, which doubles as the home link. */
-.avatar { display: block; margin-bottom: 2.75rem; border-radius: 999px; transition: opacity .12s ease-out; }
-.avatar img { display: block; width: 2.5rem; height: 2.5rem; border-radius: 999px; }
-.avatar:hover { opacity: .85; }
+/* Picture, name and one line about me; the whole card is the home link. */
+.card {
+  display: grid;
+  gap: .1rem;
+  color: var(--fg);
+  text-decoration: none;
+  transition: opacity var(--speed) ease-out;
+}
+.card:hover { opacity: .8; }
+.card img { display: block; width: 3rem; height: 3rem; border-radius: 999px; margin-bottom: .65rem; }
+.card-text { display: grid; gap: .1rem; }
+.card-name { font-weight: 600; font-size: 1.0625rem; line-height: 1.3; }
+.card-sub  { color: var(--muted); font-size: .8125rem; line-height: 1.4; }
 
-.site-nav { display: flex; flex-direction: column; gap: .35rem; }
+.site-header .site-nav,
+.card-links { padding-top: 1.25rem; border-top: 1px solid var(--rule); }
+
+.card-links { display: flex; align-items: center; }
+
+/* The current page's name is enlarged, full-strength and semibold;
+   the others are grey. Hovering a link previews that: it grows and
+   brightens, but stays regular weight so the current page is still
+   clear. scale() changes size without moving anything around it. */
+.site-nav { display: flex; flex-direction: column; gap: .3rem; }
 .site-nav a {
-  position: relative;
   color: var(--muted);
   text-decoration: none;
   font-size: .9375rem;
-  transition: color .12s ease-out;
+  transform-origin: left center;
+  transition: transform var(--speed) ease-out, color var(--speed) ease-out;
 }
-.site-nav a:hover { color: var(--fg); }
-
-/* The current page: darker text plus a small blue dot. In the
-   sidebar the dot hangs just left of the label; on phones, where
-   the nav runs across the top, it sits centred underneath. This is
-   the site's one "you are here" marker. */
-.site-nav a::before {
-  content: "";
-  position: absolute;
-  left: -.8rem;
-  top: 50%;
-  width: 5px;
-  height: 5px;
-  border-radius: 999px;
-  background: var(--accent);
-  transform: translateY(-50%) scale(0);
-  transition: transform .15s ease-out;
-}
-.site-nav a.here { color: var(--fg); font-weight: 500; }
-.site-nav a.here::before { transform: translateY(-50%) scale(1); }
-
-.site-header .theme-button { margin-top: 2.75rem; }
+.site-nav a:hover,
+.site-nav a.here { color: var(--fg); transform: scale(1.06); }
+.site-nav a.here { font-weight: 600; }
 
 /* --- Icon buttons -------------------------------------------
    Bare icons for the theme button in the sidebar and the social
@@ -152,13 +162,13 @@ a { color: var(--accent); text-underline-offset: 3px; }
   appearance: none;
   display: grid;
   place-items: center;
-  padding: .45rem;
-  margin: -.45rem;      /* cancels the padding so the icon lines up with text */
+  padding: .8125rem;    /* makes a 44px tap area, Apple's minimum */
+  margin: -.8125rem;    /* cancels the padding so the icon lines up with text */
   border: 0;
   background: none;
   color: var(--muted);
   cursor: pointer;
-  transition: color .12s ease-out;
+  transition: color var(--speed) ease-out;
 }
 .icon-button:hover { color: var(--fg); }
 .icon-button svg { width: 1.125rem; height: 1.125rem; }
@@ -172,28 +182,39 @@ a { color: var(--accent); text-underline-offset: 3px; }
 .theme-button[data-mode="dark"]   .i-dark { display: block; }
 
 /* --- Phones and narrow windows ------------------------------
-   The sidebar becomes a single bar across the top: picture on
-   the left, then the tabs, then the theme icon. The current-tab
-   dot sits centred under its label, inside the bar's bottom
-   padding, so it doesn't add a row of its own. */
+   The card collapses into one slim bar across the top: picture on
+   the left, then the tabs, then the theme icon. The name, the one-
+   line description and the social links move out of the bar (the
+   home page shows the name itself; the footer shows the links). */
 @media (max-width: 48rem) {
   .wrap { display: block; margin-top: 0; }
   .site-header {
     position: static;
     flex-direction: row;
-    align-items: center;
+    align-items: stretch;
     gap: 1.25rem;
+    height: 3.5rem;
     margin: 0 calc(-1 * var(--pad)) 2.5rem;
-    padding: 1rem var(--pad) .9rem;
+    padding: 0 var(--pad);
     border-bottom: 1px solid var(--rule);
   }
-  .avatar { margin: 0 auto 0 0; }   /* pushes the tabs and icon to the right */
-  .avatar img { width: 2rem; height: 2rem; }
-  .site-nav { flex-direction: row; gap: 1.25rem; }
-  .site-header .theme-button { margin: -.45rem; }
+  .card { align-self: center; margin-right: auto; }   /* pushes the tabs and icon right */
+  .card img { width: 2rem; height: 2rem; margin: 0; }
+  .card-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
-  .site-nav a::before { left: 50%; top: auto; bottom: -.55rem; transform: translateX(-50%) scale(0); }
-  .site-nav a.here::before { transform: translateX(-50%) scale(1); }
+  .site-header .site-nav,
+  .card-links { padding: 0; border: 0; }
+  .site-nav { flex-direction: row; gap: 1.25rem; }
+  /* Tabs fill the bar's height so the whole strip is tappable. */
+  .site-nav a { display: flex; align-items: center; transform-origin: center; }
+  .card-links { display: none; }
+  .header-theme { align-self: center; margin: -.8125rem; }
+  .footer-theme { display: none; }
+}
+
+/* Things that only make sense on one size of screen. */
+@media (min-width: 48.01rem) {
+  .phone-only, .site-footer .footer-socials, .header-theme { display: none; }
 }
 
 /* --- Footer ------------------------------------------------- */
@@ -211,22 +232,30 @@ a { color: var(--accent); text-underline-offset: 3px; }
 }
 .site-footer p { margin: 0; }
 
-.socials { display: flex; gap: 1.4rem; margin: 0; padding: 0; list-style: none; }
+.footer-right { display: flex; align-items: center; gap: 1.625rem; }
+.socials { display: flex; gap: 1.625rem; margin: 0; padding: 0; list-style: none; }
 
 /* --- Panels -------------------------------------------------
    A .panel is a stack of .row items separated by hairlines.
-   Square corners, no outline box, nothing floating. Hovering a
-   row fills it with a flat colour, exactly as wide as the
-   hairlines above and below it. */
+   Square corners, no outline box, nothing floating.
+
+   Hovering a row that is a link (a.row) does two things: its
+   grey description brightens to match the title, and the row's
+   whole content (title, date, description) grows very slightly
+   as one piece, so it's clear the entire row is the link. The
+   hairlines stay put. Plain rows don't react, since that would
+   suggest a click that does nothing. */
 .panel { margin: 1.25rem calc(-1 * var(--pad)); border-bottom: 1px solid var(--rule); }
 
 .row {
   display: block;
   border-top: 1px solid var(--rule);
   padding: 1rem var(--pad);
-  transition: background-color .12s ease-out;
 }
-.row:hover { background: var(--bg-alt); }
+a.row .row-inner { transform-origin: left center; transition: transform var(--speed) ease-out; }
+a.row:hover .row-inner { transform: scale(1.015); }
+a.row p { transition: color var(--speed) ease-out; }
+a.row:hover p { color: var(--fg); }
 
 /* A whole row that is itself a link. */
 a.row { color: inherit; text-decoration: none; }
