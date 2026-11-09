@@ -306,6 +306,8 @@ a.row { color: inherit; text-decoration: none; }
 /* --- Easter egg on the home page ----------------------------
    "Outside of that" and "pun intended" sit stacked in the same
    spot, so swapping them doesn't move the rest of the sentence.
+   The swap is instant, and the shorter phrase is centred in the
+   space the longer one takes up.
    It's a button only so taps and the keyboard work; it looks
    like plain text. */
 .pun {
@@ -313,8 +315,8 @@ a.row { color: inherit; text-decoration: none; }
   display: inline-grid;
   cursor: default;
 }
-.pun > span { grid-area: 1 / 1; transition: opacity var(--speed) ease-out; }
-.pun-alt { opacity: 0; color: var(--muted); }
+.pun > span { grid-area: 1 / 1; }
+.pun-alt { opacity: 0; color: var(--muted); justify-self: center; }
 .pun.show .pun-text { opacity: 0; }
 .pun.show .pun-alt  { opacity: 1; }
 .pun:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
